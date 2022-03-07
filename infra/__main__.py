@@ -24,4 +24,4 @@ image_name = repo.repository_url
 registry_info = None
 
 # Export the cluster's kubeconfig.
-pulumi.export('kubeconfig', cluster.kubeconfig)
+pulumi.export('repo', repo.repository_url)
