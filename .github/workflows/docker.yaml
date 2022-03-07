@@ -41,6 +41,10 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-region: eu-central-1
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          
+      - name: Set short sha
+        id: vars
+        run: echo "::set-output name=sha_short::${GITHUB_SHA::7}"
 
 
       - name: Build and push for ECR
