@@ -1,0 +1,61 @@
+
+name: Build fake-stackoverflow Container
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "fake-stackoverflow/**"
+      - ".github/workflows/docker.yaml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "fake-stackoverflow/**"
+      - ".github/workflows/docker.yaml"
+
+env:
+  docker_image: 688581759591.dkr.ecr.eu-central-1.amazonaws.com/my-repo-2d9e680/fake-stackoverflow
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: fake-stackoverflow-buildx-${{ github.sha }}
+          restore-keys: |
+            fake-stackoverflow-buildx-
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+
+      - name: Build and push for ECR
+        uses: docker/build-push-action@v2
+        with:
+          context: ./fake-stackoverflow
+          push: true
+          file: fake-stackoverflow/Dockerfile
+          tags: |
+            ${{ env.docker_image }}:prod
+            ${{ env.docker_image }}:${{ steps.vars.outputs.sha_short}}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache

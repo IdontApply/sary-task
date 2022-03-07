@@ -5,10 +5,10 @@
 replicaCount: 3
 
 image:
-  repository: nginx
+  repository: "688581759591.dkr.ecr.eu-central-1.amazonaws.com/my-repo-2d9e680"
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: fake-stackoverflow:latest
 
 imagePullSecrets: []
 nameOverride: ""
