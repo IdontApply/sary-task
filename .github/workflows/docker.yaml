@@ -50,18 +50,27 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build and push for ECR
-        uses: docker/build-push-action@v2
-        with:
-          context: ./fake-stackoverflow
-          push: true
-          file: fake-stackoverflow/Dockerfile
-          tags: |
-            ${{ env.docker_image }}:prod
-            ${{ env.docker_image }}:${{ steps.vars.outputs.sha_short}}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new
+#       - name: Build and push for ECR
+#         uses: docker/build-push-action@v2
+#         with:
+#           context: ./fake-stackoverflow
+#           push: true
+#           file: fake-stackoverflow/Dockerfile
+#           tags: |
+#             ${{ env.docker_image }}:prod
+#             ${{ env.docker_image }}:${{ steps.vars.outputs.sha_short}}
+#           cache-from: type=local,src=/tmp/.buildx-cache
+#           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: 88581759591.dkr.ecr.eu-central-1.amazonaws.com
+          ECR_REPOSITORY: my-repo-2d9e680
+          IMAGE_TAG: fakeso
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          
       - name: Move cache
         run: |
           rm -rf /tmp/.buildx-cache
