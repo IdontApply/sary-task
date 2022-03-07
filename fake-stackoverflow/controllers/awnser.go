@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fake-so/httputil"
 	m "fake-so/models"
 	"log"
 	"net/http"
@@ -9,10 +10,20 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
+// CreateUser godoc
+// @Description
+// @Tags         answers
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  m.Answers
+// @Failure      400  {object}  httputil.HTTPError
+// @Failure      404  {object}  httputil.HTTPError
+// @Failure      500  {object}  httputil.HTTPError
+// @Router       /answer [post]
 func CreateAnswerOfQuestion(c *gin.Context) {
 	var input m.Answers
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		httputil.NewError(c, http.StatusBadRequest, err)
 		return
 	}
 	answer := m.Answers{
@@ -22,7 +33,7 @@ func CreateAnswerOfQuestion(c *gin.Context) {
 	}
 
 	if err := m.DB.Create(&answer).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		httputil.NewError(c, http.StatusBadRequest, err)
 		log.Println("error: ", err.Error())
 	} else {
 		c.JSON(http.StatusOK, gin.H{"data": answer})
@@ -30,19 +41,24 @@ func CreateAnswerOfQuestion(c *gin.Context) {
 
 }
 
-// func GetAnswersOfQuestion(w http.ResponseWriter, r *http.Request) {
-// 	var answers []m.Answers
-// 	if err := db.Preload("Question").Find(&answers).Error; err != nil {
-// 		w.Header().Set("Content-Type", "application/json")
-// 		w.Header().Set("Response-Code", "06")
-// 		w.Header().Set("Response-Desc", "Data Not Found")
-// 		w.WriteHeader(404)
-// 		w.Write([]byte(`{"message":"data not found"}`))
-// 		log.Fatalf("Error GetAnswersOfQuestion: %s", err)
-// 	} else {
-// 		w.Header().Set("Content-Type", "application/json")
-// 		w.Header().Set("Response-Code", "00")
-// 		w.Header().Set("Response-Desc", "Success")
-// 		json.NewEncoder(w).Encode(&answers)
-// 	}
-// }
+// CreateUser godoc
+// @Description
+// @Tags         answers
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  m.Answers
+// @Failure      400  {object}  httputil.HTTPError
+// @Failure      404  {object}  httputil.HTTPError
+// @Failure      500  {object}  httputil.HTTPError
+// @Router       /answers [get]
+func GetAnswersOfQuestion(c *gin.Context) {
+	var question m.Questions
+	var answers []m.Answers
+	if err := m.DB.First(&question, c.Param("id")).Error; err != nil {
+		log.Println("error: ", err)
+		httputil.NewError(c, http.StatusBadRequest, err)
+		return
+	} else {
+		m.DB.Where("question <> ?", c.Param("id")).Find(&answers)
+	}
+}

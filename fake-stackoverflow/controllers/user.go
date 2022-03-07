@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/swaggo/gin-swagger"
 )
 
 // CreateUser godoc

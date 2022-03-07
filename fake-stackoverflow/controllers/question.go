@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fake-so/httputil"
 	m "fake-so/models"
 	"log"
 	"net/http"
@@ -9,10 +10,20 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
+// CreateUser godoc
+// @Description
+// @Tags         questions
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  m.Questions
+// @Failure      400  {object}  httputil.HTTPError
+// @Failure      404  {object}  httputil.HTTPError
+// @Failure      500  {object}  httputil.HTTPError
+// @Router       /question [post]
 func CreateQuestion(c *gin.Context) {
 	var input m.Questions
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		httputil.NewError(c, http.StatusBadRequest, err)
 		return
 	}
 	question := m.Questions{
@@ -23,36 +34,56 @@ func CreateQuestion(c *gin.Context) {
 	}
 
 	if err := m.DB.Create(&question).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		httputil.NewError(c, http.StatusBadRequest, err)
 		log.Println("error: ", err.Error())
 	} else {
 		c.JSON(http.StatusOK, gin.H{"data": question})
 	}
 }
 
+// CreateUser godoc
+// @Description
+// @Tags         questions
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  m.Questions
+// @Failure      400  {object}  httputil.HTTPError
+// @Failure      404  {object}  httputil.HTTPError
+// @Failure      500  {object}  httputil.HTTPError
+// @Router       /question [get]
 func GetQuestionByID(c *gin.Context) {
 	var question m.Questions
 	var answers []m.Answers
-	if err := m.DB.Find(&question); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+	if err := m.DB.Find(&question).Error; err != nil {
+		httputil.NewError(c, http.StatusBadRequest, err)
 		log.Println("error: ", err)
 		return
 	} else {
 		c.JSON(http.StatusOK, gin.H{"data": question})
 	}
-	if err := m.DB.First(&question, c.Param("id")); err != nil {
+	if err := m.DB.First(&question, c.Param("id")).Error; err != nil {
 		log.Println("error: ", err)
-		c.Writer.WriteHeader(404)
+		httputil.NewError(c, http.StatusBadRequest, err)
 		return
 	} else {
 		m.DB.Where("question <> ?", c.Param("id")).Find(&answers)
 	}
 }
 
+// CreateUser godoc
+// @Description
+// @Tags         questions
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  m.Questions
+// @Failure      400  {object}  httputil.HTTPError
+// @Failure      404  {object}  httputil.HTTPError
+// @Failure      500  {object}  httputil.HTTPError
+// @Router       /questions [get]
 func GetQuestions(c *gin.Context) {
 	var questions []m.Questions
-	if err := m.DB.Find(&questions); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+	if err := m.DB.Find(&questions).Error; err != nil {
+		httputil.NewError(c, http.StatusBadRequest, err)
 		log.Println("error: ", err)
 		return
 	} else {

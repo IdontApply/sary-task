@@ -1,10 +1,18 @@
-FROM golang:1.14 as builder
-WORKDIR /go/src/fake-stackoverflow
-RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux go build -v -o fake-stackoverflow# multistage build
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-RUN mkdir /templates
-COPY --from=builder /go/src/fake-stackoverflow/fake-stackoverflow /fake-stackoverflow
-EXPOSE 8080
-CMD ["/fake-stackoverflow"]
+FROM golang:alpine
+
+ADD . /go/src/app
+WORKDIR /go/src/app
+ENV PORT=8080
+RUN go get .
+RUN go install
+
+# COPY go.mod .
+# COPY go.sum .
+# RUN go mod download
+# COPY [ "main.go", "models", "httputil", "controllers",  "./"]
+
+# RUN go build -o /app
+
+EXPOSE $PORT
+
+ENTRYPOINT ["/go/bin/app"]
