@@ -1,18 +1,12 @@
-FROM golang:alpine
+FROM golang:1.17
 
-ADD . /go/src/app
-WORKDIR /go/src/app
-ENV PORT=8080
-RUN go get .
-RUN go install
+WORKDIR /usr/src/app
 
-# COPY go.mod .
-# COPY go.sum .
-# RUN go mod download
-# COPY [ "main.go", "models", "httputil", "controllers",  "./"]
+# pre-copy/cache go.mod for pre-downloading dependencies and only redownloading them in subsequent builds if they change
+COPY go.mod go.sum ./
+RUN go mod download && go mod verify
 
-# RUN go build -o /app
+COPY . .
+RUN go build -v -o /usr/local/bin/app ./...
 
-EXPOSE $PORT
-
-ENTRYPOINT ["$GOPATH/bin/app"]
+ENTRYPOINT ["app"]
