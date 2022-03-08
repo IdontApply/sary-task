@@ -5,6 +5,8 @@ metadata:
   labels:
     {{- include "fake-stackoverflow.labels" . | nindent 4 }}
 spec:
+  selector:
+    app: {{ include "fake-stackoverflow.fullname" . }}
   type: LoadBalancer
   ports:
     - port: 8080

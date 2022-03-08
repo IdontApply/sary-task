@@ -8,11 +8,15 @@ image:
   repository: "688581759591.dkr.ecr.eu-central-1.amazonaws.com/my-repo-2d9e680"
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: fake-stackoverflow:latest
+  tag: fake-stackoverflow
 
 imagePullSecrets: []
 nameOverride: ""
-fullnameOverride: ""
+fullnameOverride: "stackoverflow"
+
+envFrom:
+  - configMapRef:
+      name: postgres-config
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -50,7 +54,7 @@ resources: {}
 
 autoscaling:
   enabled: false
-  minReplicas: 1
+  minReplicas: 3
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
