@@ -15,4 +15,4 @@ RUN go install
 
 EXPOSE $PORT
 
-ENTRYPOINT ["/go/bin/app"]
+ENTRYPOINT ["$GOPATH/bin/app"]
