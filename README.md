@@ -1,6 +1,6 @@
 # sary-task
 
-url: 
+url: a74dfa04af530480d91ba174e610afe9-2139051881.eu-central-1.elb.amazonaws.com:8080
 
 ### Infra
 Folder is for infrastructure, using pulumi as the Iac.
