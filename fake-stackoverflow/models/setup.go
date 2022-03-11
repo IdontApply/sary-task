@@ -28,13 +28,13 @@ func ConnectDatabase() {
 		panic("Failed to connect to database!")
 	}
 
-	if err := database.AutoMigrate(&Users{}, &Tags{}); err != nil {
+	if err := database.AutoMigrate(&Users{}, &Tag{}); err != nil {
 		log.Print("Error AutoMigrate: ", err)
 	}
-	if err := database.AutoMigrate(&Questions{}); err != nil {
+	if err := database.AutoMigrate(&Question{}); err != nil {
 		log.Print("Error AutoMigrate: ", err)
 	}
-	if err := database.AutoMigrate(&Answers{}); err != nil {
+	if err := database.AutoMigrate(&Answer{}); err != nil {
 		log.Print("Error AutoMigrate: ", err)
 	}
 

@@ -8,39 +8,46 @@ import (
 
 type Users struct {
 	gorm.Model
-	Name string `gorm:"unique" json:"name"`
+	Name               string              `gorm:"unique" json:"name"`
+	Questions          []Question          `gorm:"foreignKey:UserRefer"`
+	Answerss           []Answer            `gorm:"foreignKey:UserRefer"`
+	CommentOnQuestions []CommentOnQuestion `gorm:"foreignKey:UserRefer"`
+	CommentOnAnswer    []CommentOnAnswer   `gorm:"foreignKey:UserRefer"`
 }
 
-type Answers struct {
+type Answer struct {
 	gorm.Model
-	Body     string    `json:"body" binding:"required"`
-	User     Users     `gorm:"foreignKey:ID" json:"user" binding:"required"`
-	Question Questions `gorm:"foreignKey:ID" json:"questions" binding:"required"`
+	Body            string            `json:"body" binding:"required"`
+	UserRefer       uint              `json:"userrefer" binding:"required"`
+	QuestionRefer   uint              `json:"questionrefer" binding:"required"`
+	CommentOnAnswer []CommentOnAnswer `gorm:"foreignKey:AnswerRefer"`
 }
 
-type Questions struct {
+type Question struct {
 	gorm.Model
-	Tital string `json:"tital" binding:"required"`
-	Body  string `json:"body"`
-	Tags  []Tags `gorm:"foreignKey:Name" json:"tags"`
-	User  Users  `gorm:"foreignKey:ID" json:"users" binding:"required"`
+	Tital              string              `json:"tital" binding:"required"`
+	Body               string              `json:"body"`
+	Tags               []Tag               `gorm:"many2many:question_tags;"`
+	UserRefer          uint                `json:"userrefer" binding:"required"`
+	Answers            []Answer            `gorm:"foreignKey:QuestionRefer"`
+	CommentOnQuestions []CommentOnQuestion `gorm:"foreignKey:QuestionRefer"`
 }
 
-type CommentsOnQuestion struct {
+type CommentOnQuestion struct {
 	gorm.Model
-	Body     string    `json:"body" binding:"required"`
-	User     Users     `gorm:"foreignKey:ID" json:"user" binding:"required"`
-	Question Questions `gorm:"foreignKey:ID" json:"question" binding:"required"`
+	Body          string `json:"body" binding:"required"`
+	UserRefer     uint   `json:"userrefer" binding:"required"`
+	QuestionRefer uint   `json:"questionrefer" binding:"required"`
 }
 
-type CommentsOnAnswer struct {
+type CommentOnAnswer struct {
 	gorm.Model
-	Body   string  `json:"body"`
-	User   Users   `gorm:"foreignKey:ID" json:"user" binding:"required"`
-	Answer Answers `gorm:"foreignKey:ID" json:"question" binding:"required"`
+	Body        string `json:"body"`
+	UserRefer   uint   `json:"userrefer" binding:"required"`
+	AnswerRefer uint   `json:"answerrefer" binding:"required"`
 }
 
-type Tags struct {
+type Tag struct {
 	gorm.Model
 	Name string `gorm:"unique" json:"name" binding:"required"`
 }

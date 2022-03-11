@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"gorm.io/gorm/clause"
 )
 
 // CreateUser godoc
@@ -21,19 +22,19 @@ import (
 // @Failure      500  {object}  httputil.HTTPError
 // @Router       /question [post]
 func CreateQuestion(c *gin.Context) {
-	var input m.Questions
+	var input m.Question
 	if err := c.ShouldBindJSON(&input); err != nil {
 		httputil.NewError(c, http.StatusBadRequest, err)
 		return
 	}
-	question := m.Questions{
-		Body:  input.Body,
-		User:  input.User,
-		Tital: input.Tital,
-		Tags:  input.Tags,
+	question := m.Question{
+		Body:      input.Body,
+		UserRefer: input.UserRefer,
+		Tital:     input.Tital,
+		Tags:      input.Tags,
 	}
 
-	if err := m.DB.Create(&question).Error; err != nil {
+	if err := m.DB.Omit(clause.Associations).Create(&question).Error; err != nil {
 		httputil.NewError(c, http.StatusBadRequest, err)
 		log.Println("error: ", err.Error())
 	} else {
@@ -52,8 +53,8 @@ func CreateQuestion(c *gin.Context) {
 // @Failure      500  {object}  httputil.HTTPError
 // @Router       /question [get]
 func GetQuestionByID(c *gin.Context) {
-	var question m.Questions
-	var answers []m.Answers
+	var question m.Question
+	var answers []m.Answer
 	if err := m.DB.Find(&question).Error; err != nil {
 		httputil.NewError(c, http.StatusBadRequest, err)
 		log.Println("error: ", err)
@@ -81,7 +82,7 @@ func GetQuestionByID(c *gin.Context) {
 // @Failure      500  {object}  httputil.HTTPError
 // @Router       /questions [get]
 func GetQuestions(c *gin.Context) {
-	var questions []m.Questions
+	var questions []m.Question
 	if err := m.DB.Find(&questions).Error; err != nil {
 		httputil.NewError(c, http.StatusBadRequest, err)
 		log.Println("error: ", err)

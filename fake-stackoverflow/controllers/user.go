@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"gorm.io/gorm/clause"
 )
 
 // CreateUser godoc
@@ -27,7 +28,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 	user := m.Users{Name: input.Name}
-	m.DB.Create(&user)
+	m.DB.Omit(clause.Associations).Create(&user)
 
 	c.JSON(http.StatusOK, gin.H{"data": user})
 }

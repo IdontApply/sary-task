@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm/clause"
 )
 
 // CreateUser godoc
@@ -20,18 +21,18 @@ import (
 // @Failure      500  {object}  httputil.HTTPError
 // @Router       /question/comment [post]
 func CreateCommentOnQuestion(c *gin.Context) {
-	var input m.CommentsOnQuestion
+	var input m.CommentOnQuestion
 	if err := c.ShouldBindJSON(&input); err != nil {
 		httputil.NewError(c, http.StatusBadRequest, err)
 		return
 	}
-	comment := m.CommentsOnQuestion{
-		Body:     input.Body,
-		User:     input.User,
-		Question: input.Question,
+	comment := m.CommentOnQuestion{
+		Body:          input.Body,
+		UserRefer:     input.UserRefer,
+		QuestionRefer: input.QuestionRefer,
 	}
 
-	if err := m.DB.Create(&comment).Error; err != nil {
+	if err := m.DB.Omit(clause.Associations).Create(&comment).Error; err != nil {
 		httputil.NewError(c, http.StatusBadRequest, err)
 		log.Println("error: ", err.Error())
 	} else {
@@ -50,7 +51,7 @@ func CreateCommentOnQuestion(c *gin.Context) {
 // @Failure      500  {object}  httputil.HTTPError
 // @Router       /question/{q_id}/comments [get]
 func GetCommentsOnQuestion(c *gin.Context) {
-	var CommentsOnQuestion []m.CommentsOnQuestion
+	var CommentsOnQuestion []m.CommentOnQuestion
 	if err := m.DB.Find(&CommentsOnQuestion).Error; err != nil {
 		httputil.NewError(c, http.StatusBadRequest, err)
 		log.Println("error: ", err)
@@ -72,18 +73,18 @@ func GetCommentsOnQuestion(c *gin.Context) {
 // @Failure      500  {object}  httputil.HTTPError
 // @Router       /question/answer/comment [post]
 func CreateCommentOnAnswer(c *gin.Context) {
-	var input m.CommentsOnAnswer
+	var input m.CommentOnAnswer
 	if err := c.ShouldBindJSON(&input); err != nil {
 		httputil.NewError(c, http.StatusBadRequest, err)
 		return
 	}
-	comment := m.CommentsOnAnswer{
-		Body:   input.Body,
-		User:   input.User,
-		Answer: input.Answer,
+	comment := m.CommentOnAnswer{
+		Body:        input.Body,
+		UserRefer:   input.UserRefer,
+		AnswerRefer: input.AnswerRefer,
 	}
 
-	if err := m.DB.Create(&comment).Error; err != nil {
+	if err := m.DB.Omit(clause.Associations).Create(&comment).Error; err != nil {
 		httputil.NewError(c, http.StatusBadRequest, err)
 		log.Println("error: ", err.Error())
 	} else {
@@ -102,7 +103,7 @@ func CreateCommentOnAnswer(c *gin.Context) {
 // @Failure      500  {object}  httputil.HTTPError
 // @Router       /question/{q_id}/answer/{a_id}/comments [get]
 func GetCommentsOnAnswer(c *gin.Context) {
-	var CommentsOnAnswer []m.CommentsOnAnswer
+	var CommentsOnAnswer []m.CommentOnAnswer
 	if err := m.DB.Find(&CommentsOnAnswer).Error; err != nil {
 		httputil.NewError(c, http.StatusBadRequest, err)
 		log.Println("error: ", err)

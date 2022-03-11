@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"gorm.io/gorm/clause"
 )
 
 // CreateUser godoc
@@ -20,13 +21,13 @@ import (
 // @Failure      500  {object}  httputil.HTTPError
 // @Router       /tag [post]
 func CreateTag(c *gin.Context) {
-	var input m.Tags
+	var input m.Tag
 	if err := c.ShouldBindJSON(&input); err != nil {
 		httputil.NewError(c, http.StatusBadRequest, err)
 		return
 	}
-	tag := m.Tags{Name: input.Name}
-	m.DB.Create(&tag)
+	tag := m.Tag{Name: input.Name}
+	m.DB.Omit(clause.Associations).Create(&tag)
 
 	c.JSON(http.StatusOK, gin.H{"data": tag})
 }
