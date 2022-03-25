@@ -15,3 +15,5 @@ spec:
       name: http
   selector:
     {{- include "fake-stackoverflow.selectorLabels" . | nindent 4 }}
+
+### expose swagger to the internet, or setup port-forward explnation 
